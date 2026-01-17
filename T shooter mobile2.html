@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<title>Triangle Shooter - Mobile Portrait</title>
+<style>
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+/* Start & Game Over Screens */
+#startScreen, #gameOverScreen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(#222, #000);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+#gameOverScreen { display: none; }
+
+input, button { padding: 10px; margin: 5px; font-size: 16px; }
+
+#leaderboard {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    width: 260px;
+    text-align: center;
+}
+
+/* Canvas */
+canvas { display: none; touch-action: none; }
+
+/* Pause button */
+#pauseBtn {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    display: none;
+}
+
+/* Mobile Controls portrait */
+#mobileControls {
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    z-index: 10;
+    display: none;
+}
+
+#mobileControls button {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    border-radius: 50%;
+    opacity: 0.7;
+}
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+    <h1>🔺 Triangle Shooter</h1>
+    <input id="username" placeholder="Insert your username">
+    <button onclick="startGame()">START</button>
+    <div id="leaderboard">
+        <h3>LEADERBOARD</h3>
+        <ul id="scores"></ul>
+    </div>
+</div>
+
+<div id="gameOverScreen">
+    <h1 style="color:red;">💥 GAME OVER 💥</h1>
+    <p id="finalScore"></p>
+    <button onclick="location.reload()">RESTART</button>
+</div>
+
+<button id="pauseBtn" onclick="togglePause()">PAUSE</button>
+<canvas id="game"></canvas>
+
+<div id="mobileControls">
+    <button id="leftBtn">⬅️</button>
+    <button id="shootBtn">🔫</button>
+    <button id="rightBtn">➡️</button>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+// Set canvas portrait dimensions
+function resizeCanvas() {
+    canvas.width = Math.min(window.innerWidth, window.innerHeight);
+    canvas.height = Math.max(window.innerWidth, window.innerHeight);
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+let bullets = [];
+let enemies = [];
+let score = 0;
+let paused = false;
+let gameOver = false;
+let username = localStorage.getItem("username") || "";
+let lives = 3;
+let enemySpeed = 3;
+
+const keys = {};
+const player = { x: canvas.width / 2, y: canvas.height - 80, size: 40, speed: 7 };
+
+window.addEventListener("keydown", e => keys[e.key] = true);
+window.addEventListener("keyup", e => keys[e.key] = false);
+
+// MOBILE BUTTONS
+const leftBtn = document.getElementById("leftBtn");
+const rightBtn = document.getElementById("rightBtn");
+const shootBtn = docum
